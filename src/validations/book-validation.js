@@ -4,9 +4,17 @@ const registerBookValidation = Joi.object({
     code: Joi.string().required().max(20),
     title: Joi.string().required().max(100),
     author: Joi.string().required().max(100),
-    stock: Joi.number().required().positive()
+    stock: Joi.number().required().positive().min(1)
+});
+
+const updateBookValidation = Joi.object({
+    code: Joi.string().required().max(20),
+    title: Joi.string().required().max(100),
+    author: Joi.string().required().max(100),
+    stock: Joi.number().required().positive().min(1)
 });
 
 export {
-    registerBookValidation
+    registerBookValidation,
+    updateBookValidation
 }
