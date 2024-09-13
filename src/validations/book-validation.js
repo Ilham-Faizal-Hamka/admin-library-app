@@ -14,7 +14,10 @@ const updateBookValidation = Joi.object({
     stock: Joi.number().required().positive().min(1)
 });
 
+const getBookValidation = Joi.string().required().max(20);
+
 export {
     registerBookValidation,
-    updateBookValidation
+    updateBookValidation,
+    getBookValidation
 }

@@ -1,8 +1,10 @@
 import { prismaClient } from "../application/database";
 import { validate } from "../validations/validation";
 import { ResponseError } from "../error/response-error";
-import { updateBookValidation, registerBookValidation } from "../validations/book-validation";
+import { updateBookValidation, registerBookValidation, getBookValidation } from "../validations/book-validation";
 
+
+// resgister new book 
 const registerBook = async(request) => {
     const book = validate(registerBookValidation, request);
 
@@ -28,6 +30,52 @@ const registerBook = async(request) => {
     });
 } 
 
+// get specific book
+const get = async(request) => {
+    const bookCode = validate(getBookValidation, request);
+
+    const countBook = await prismaClient.book.count({
+        where: {
+            code: bookCode
+        }
+    });
+
+    if(countBook !== 1){
+        throw new ResponseError(404, "Book is not found");
+    };
+
+    return prismaClient.book.findUnique({
+        where: {
+            code: bookCode
+        },
+        select: {
+            code: true,
+            title: true,
+            author: true,
+            stock: true
+        }
+    });
+}
+
+// get all books 
+const list = async() => {
+    const countBook = await prismaClient.book.count();
+
+    if(countBook === 0){
+        throw new ResponseError(404, "Book is not found");
+    };
+
+    return prismaClient.book.findMany({
+        select: {
+            code: true,
+            title: true,
+            author: true,
+            stock: true
+        }
+    });
+}
+
+// update book
 const update = async(request) => {
     const book = validate(updateBookValidation, request);
     
@@ -62,7 +110,10 @@ const update = async(request) => {
 
 
 
+
 export default {
     registerBook,
-    update
+    get,
+    list,
+    update,
 }

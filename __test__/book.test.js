@@ -53,6 +53,64 @@ describe("POST /books", () => {
     });
 })
 
+describe("GET /books/:code", () => {
+    beforeEach(async() => {
+        await createBookTest();
+    });
+
+    afterEach(async() => {
+        await removeBookTest();
+    });
+
+    it("should can get specific book", async() => {
+        const bookTest = await getBookTest();
+
+        const result = await supertest(web)
+            .get("/books/" + bookTest.code);
+
+        expect(result.status).toBe(200);
+        expect(result.body.data.code).toBe("test-45");
+        expect(result.body.data.title).toBe("test-title");
+        expect(result.body.data.author).toBe("test-author");
+        expect(result.body.data.stock).toBe(1);
+    });
+
+    it("should not found when the book code is not found", async() => {
+        const result = await supertest(web)
+            .get("/books/not-found");
+
+        expect(result.status).toBe(404);
+        expect(result.body.errors).toBeDefined();
+    });
+})
+
+describe("GET /books/", () => {
+    beforeEach(async() => {
+        await createBookTest();
+    });
+
+    afterEach(async() => {
+        await removeBookTest();
+    })
+
+    it("should can list all books in library", async() => {
+        const result = await supertest(web)
+            .get("/books");
+
+        expect(result.status).toBe(200);
+    })
+
+    it("should not found any book if the books is empty", async() => {
+        await removeBookTest();
+
+        const result = await supertest(web)
+            .get("/books");
+
+        expect(result.status).toBe(404);
+        expect(result.body.errors).toBeDefined();
+    })
+})
+
 describe("PUT /books/:code", () => {
     beforeEach(async() => {
         await createBookTest();
