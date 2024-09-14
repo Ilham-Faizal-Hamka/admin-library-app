@@ -1,8 +1,19 @@
 import memberService from "../services/member-service";
 
-const regisgterMember = async(req, res, next) => {
+const regisgter = async(req, res, next) => {
     try {
-        const result = await memberService.registerMember(req.body);
+        const result = await memberService.register(req.body);
+        res.status(200).json({
+            data: result
+        });
+    } catch (e) {
+        next(e);
+    }
+}
+
+const list = async(req, res, next) => {
+    try {
+        const result = await memberService.list();
         res.status(200).json({
             data: result
         });
@@ -42,7 +53,8 @@ const returnBook = async(req, res, next) => {
 }
 
 export default {
-    regisgterMember,
+    regisgter,
+    list,
     borrowBook,
     returnBook
 }

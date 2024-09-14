@@ -1,4 +1,5 @@
 node_modules/
 .idx
 .env
+.vscode
 **/migrations/

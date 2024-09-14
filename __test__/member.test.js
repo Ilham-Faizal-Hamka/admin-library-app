@@ -46,6 +46,28 @@ describe("POST /members", () => {
     });
 });
 
+describe("GET /members/", () => {
+    beforeEach(async() => {
+        await createMemberTest();
+        await createBookTest();
+        await createBorrowedBookTest();
+    });
+
+    afterEach(async() => {
+        await removeBorrowedBookTest();
+        await removeBookTest();
+        await removeMemberTest();
+    });
+
+    it("should can list all members", async() => {
+        const result = await supertest(web)
+            .get("/members");
+
+        expect(result.status).toBe(200);
+        console.info(result.body.data);
+    });
+})
+
 describe("POST /members/:memberCode/borrow/:bookCode", () => {
     beforeEach(async() => {
         await createMemberTest();

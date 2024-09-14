@@ -5,13 +5,14 @@ import memberController from "../controllers/member-controller";
 const publicRouter = new express.Router();
 
 // books route
-publicRouter.post("/books", bookController.registerBook);
-publicRouter.get("/books/:code", bookController.get);
+publicRouter.post("/books", bookController.register);
 publicRouter.get("/books", bookController.list);
+publicRouter.get("/books/:code", bookController.get);
 publicRouter.put("/books/:code", bookController.update);
 
 //member routes
-publicRouter.post("/members", memberController.regisgterMember);
+publicRouter.post("/members", memberController.regisgter);
+publicRouter.get("/members", memberController.list);
 publicRouter.post("/members/:memberCode/borrow/:bookCode", memberController.borrowBook);
 publicRouter.delete("/members/:memberCode/return/:bookCode", memberController.returnBook);
 

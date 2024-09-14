@@ -5,7 +5,7 @@ import { updateBookValidation, registerBookValidation, getBookValidation } from 
 
 
 // resgister new book 
-const registerBook = async(request) => {
+const register = async(request) => {
     const book = validate(registerBookValidation, request);
 
     const countBook = await prismaClient.book.count({
@@ -125,7 +125,7 @@ const update = async(request) => {
 }
 
 export default {
-    registerBook,
+    register,
     get,
     list,
     update

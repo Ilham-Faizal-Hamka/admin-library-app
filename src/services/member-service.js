@@ -21,7 +21,7 @@ const checkBookExistence = async(bookCode) => {
     }
 
     return book;
-}
+};
 
 const checkMemberExistence = async(memberCode) => {
     memberCode = validate(getMemberValidation, memberCode);
@@ -40,9 +40,9 @@ const checkMemberExistence = async(memberCode) => {
     }
 
     return member;
-}
+};
 
-const registerMember = async(request) => {
+const register = async(request) => {
     const member = validate(registerMemberValidation, request);
 
     const countMember = await prismaClient.member.count({
@@ -64,6 +64,15 @@ const registerMember = async(request) => {
         }
     });
 };
+
+// list all members
+const list = async() => {
+    return prismaClient.member.findMany({
+        include : {
+            borrows: true
+        }
+    });
+}
 
 const borrowBook = async(memberCode, bookCode) => {
     const member = await checkMemberExistence(memberCode);
@@ -117,7 +126,7 @@ const borrowBook = async(memberCode, bookCode) => {
             book: true
         }
     });
-}
+};
 
 const returnBook = async(memberCode, bookCode) => {
     const member = await checkMemberExistence(memberCode);
@@ -144,9 +153,6 @@ const returnBook = async(memberCode, bookCode) => {
     const now = new Date();
     const borrowedAt = new Date(bookBorrowed.borrowedAt);
     const daysBorrowed = (now - borrowedAt) / (1000 * 60 * 60 * 24);
-    console.info(now);
-    console.info(borrowedAt);
-    console.info(daysBorrowed);
 
     // apply penalty if borrow more than 7 days
     if(daysBorrowed > 7) {
@@ -184,10 +190,11 @@ const returnBook = async(memberCode, bookCode) => {
             book: true
         }
     });
-}
+};
 
 export default {
-    registerMember,
+    register,
+    list,
     borrowBook,
     returnBook
 };
