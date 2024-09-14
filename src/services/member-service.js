@@ -60,7 +60,7 @@ const registerMember = async(request) => {
         select: {
             name: true,
             code: true,
-            penalty: true,
+            penalizedUntil: true,
         }
     });
 };
@@ -69,9 +69,26 @@ const borrowBook = async(memberCode, bookCode) => {
     const member = await checkMemberExistence(memberCode);
     const book = await checkBookExistence(bookCode);
 
+    // check if the book is available
+    if(book.stock === 0) {
+        throw new ResponseError(400, "Book is out of stock");
+    }
+    
     //check member condition
-    if(member.penalty) {
-        throw new ResponseError(400, "Member is penalized")
+    const now = new Date();
+    if(member.penalizedUntil) {
+        if(member.penalizedUntil > now) {
+            throw new ResponseError(400, `Member is penalized until ${member.penalizedUntil}`)
+        } else {
+            await prismaClient.member.update({
+                where: {
+                    code: member.code
+                },
+                data: {
+                    penalizedUntil: null
+                }
+            });
+        }
     }
 
     if(member.borrows.length >= 2) {
@@ -106,11 +123,6 @@ const returnBook = async(memberCode, bookCode) => {
     const member = await checkMemberExistence(memberCode);
     const book = await checkBookExistence(bookCode);
 
-    console.info(member);
-    console.info(book);
-    console.info(member.code)
-    console.info(book.code)
-
     // check if the book was borrowed by the member
     const bookBorrowed = await prismaClient.borrowedBook.findFirst({
         where: {
@@ -123,9 +135,6 @@ const returnBook = async(memberCode, bookCode) => {
             borrowedAt: true
         }
     });
-
-    console.info(bookBorrowed);
-
 
     if (!bookBorrowed) {
         throw new ResponseError(404, "Books are not borrowed by the member concerned");
@@ -141,12 +150,14 @@ const returnBook = async(memberCode, bookCode) => {
 
     // apply penalty if borrow more than 7 days
     if(daysBorrowed > 7) {
+        // penalized until 3 days from now
+        const penalized = new Date(now.getTime() + (1000 * 60 * 60 * 24 * 3))
         await prismaClient.member.update({
             where: {
                 code: member.code
             },
             data: {
-                penalty: true
+                penalizedUntil: penalized
             }
         });
     }

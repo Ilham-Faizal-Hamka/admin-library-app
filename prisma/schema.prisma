@@ -16,7 +16,7 @@ datasource db {
 model Member {
   code String @id @db.VarChar(20)
   name String @db.VarChar(100)
-  penalty Boolean @default(false)
+  penalizedUntil DateTime?
   borrows BorrowedBook[]
 
   @@map("members")

@@ -1,6 +1,18 @@
 import supertest from "supertest";
 import { web } from "../src/application/web";
-import { createBookTest, removeBookTest, getBookTest, createMemberTest, removeMemberTest, getMemberTest, createBorrowedBookTest, removeBorrowedBookTest } from "./test-utils";
+import { createBookTest, 
+    removeBookTest, 
+    getBookTest, 
+    createMemberTest, 
+    removeMemberTest, 
+    getMemberTest, 
+    createBorrowedBookTest, 
+    removeBorrowedBookTest, 
+    getMemberPenalizedTest, 
+    getBookExceedDeadlineTest, 
+    getMemberExceedDeadlineTest, 
+    createExceedDeadlineBorrowedBooks 
+} from "./test-utils";
 
 
 describe("POST /members", () => { 
@@ -63,7 +75,7 @@ describe("POST /members/:memberCode/borrow/:bookCode", () => {
     it("should reject if member is not found", async() => {
         const book = await getBookTest();
         const result = await supertest(web)
-            .post("/members/test-46/borrow/" + book.code);
+            .post("/members/test-not-found/borrow/" + book.code);
 
         expect(result.status).toBe(404);
         expect(result.body.errors).toBeDefined();
@@ -72,10 +84,22 @@ describe("POST /members/:memberCode/borrow/:bookCode", () => {
     it("should reject if book is not found", async() => {
         const member = await getMemberTest();
         const result = await supertest(web)
-            .post("/members/" + member.code + "/borrow/test-46");
+            .post("/members/" + member.code + "/borrow/test-not-found");
 
         expect(result.status).toBe(404);
         expect(result.body.errors).toBeDefined();
+    });
+
+    it("shloud reject if member is penalized", async() => {
+        const book = await getBookTest();
+        const member = await getMemberPenalizedTest();
+
+        const result = await supertest(web)
+            .post("/members/" + member.code + "/borrow/" + book.code);
+        
+        expect(result.status).toBe(400);
+        expect(result.body.errors).toBeDefined;
+        console.info(result.body.errors);
     });
 });
 
@@ -104,11 +128,25 @@ describe("POST /members/:memberCode/return/:bookCode", () => {
     })
 
     it("should reject if member who borrow the book and book does not match", async() => {
-        
+
         const result = await supertest(web)
             .delete("/members/test-46/return/test-45");
 
         expect(result.status).toBe(404);
         expect(result.body.errors).toBeDefined();
+    })
+
+    it("should get penalty if member return book more than 7 days", async() => {
+        await createExceedDeadlineBorrowedBooks();
+
+        const member = await getMemberExceedDeadlineTest();
+        const book = await getBookExceedDeadlineTest();
+
+        const result = await supertest(web)
+            .delete("/members/" + member.code + "/return/" + book.code);
+
+        expect(result.status).toBe(200);
+        expect(result.body.message).toBe("Book returned successfully");
+        expect(result.body.data.member.penalizedUntil).toBeDefined();
     })
 });
