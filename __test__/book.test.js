@@ -1,6 +1,12 @@
 import supertest from "supertest";
 import { web } from "../src/application/web";
-import { createBookTest, getBookTest, removeBookTest } from "./test-utils";
+import { createBookTest, 
+    createBorrowedBookTest, 
+    createMemberTest, 
+    getBookTest, 
+    removeBookTest, 
+    removeMemberTest, 
+    removeBorrowedBookTest } from "./test-utils";
 
 describe("POST /books", () => {
     afterEach(async() => {
@@ -87,27 +93,22 @@ describe("GET /books/:code", () => {
 describe("GET /books/", () => {
     beforeEach(async() => {
         await createBookTest();
+        await createMemberTest();
+        await createBorrowedBookTest();
     });
 
     afterEach(async() => {
+        await removeBorrowedBookTest();
+        await removeMemberTest();
         await removeBookTest();
     })
 
-    it("should can list all books in library", async() => {
+    it("should can list all available books in library", async() => {
         const result = await supertest(web)
             .get("/books");
 
         expect(result.status).toBe(200);
-    })
-
-    it("should not found any book if the books is empty", async() => {
-        await removeBookTest();
-
-        const result = await supertest(web)
-            .get("/books");
-
-        expect(result.status).toBe(404);
-        expect(result.body.errors).toBeDefined();
+        expect(result.body.data.totalAvailableBooks).toBe(3)
     })
 })
 
@@ -153,6 +154,3 @@ describe("PUT /books/:code", () => {
         expect(result.body.errors).toBeDefined();
     })
 })
-
-
-

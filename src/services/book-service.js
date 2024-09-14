@@ -57,7 +57,7 @@ const get = async(request) => {
     });
 }
 
-// get all books 
+// get all available books 
 const list = async() => {
     const countBook = await prismaClient.book.count();
 
@@ -65,7 +65,18 @@ const list = async() => {
         throw new ResponseError(404, "Book is not found");
     };
 
-    return prismaClient.book.findMany({
+    const totalAvailableBooks = await prismaClient.book.aggregate({
+        _sum: {
+            stock: true
+        }
+    });
+
+    const availableBooks = await prismaClient.book.findMany({
+        where: {
+            stock: {
+                gt: 0
+            }
+        },
         select: {
             code: true,
             title: true,
@@ -73,6 +84,11 @@ const list = async() => {
             stock: true
         }
     });
+
+    return {
+        availableBooks,
+        totalAvailableBooks: totalAvailableBooks._sum.stock
+    }
 }
 
 // update book
@@ -108,12 +124,9 @@ const update = async(request) => {
     });
 }
 
-
-
-
 export default {
     registerBook,
     get,
     list,
-    update,
+    update
 }

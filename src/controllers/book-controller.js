@@ -48,10 +48,9 @@ const update = async(req, res, next) => {
     }
 }
 
-
 export default {
     registerBook,
     get,
     list,
-    update,
+    update
 }
