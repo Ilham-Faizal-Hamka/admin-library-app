@@ -9,7 +9,7 @@ const regisgter = async(req, res, next) => {
     } catch (e) {
         next(e);
     }
-}
+};
 
 const list = async(req, res, next) => {
     try {
@@ -20,7 +20,7 @@ const list = async(req, res, next) => {
     } catch (e) {
         next(e);
     }
-}
+};
 
 const borrowBook = async(req, res, next) => {
     try {
@@ -35,7 +35,7 @@ const borrowBook = async(req, res, next) => {
     } catch (e) {
         next(e);
     }
-}
+};
 
 const returnBook = async(req, res, next) => {
     try {
@@ -50,11 +50,11 @@ const returnBook = async(req, res, next) => {
     } catch (e) {
         next(e);
     }
-}
+};
 
 export default {
     regisgter,
     list,
     borrowBook,
     returnBook
-}
+};

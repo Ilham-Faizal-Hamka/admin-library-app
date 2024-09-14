@@ -20,4 +20,4 @@ export {
     registerBookValidation,
     updateBookValidation,
     getBookValidation
-}
+};

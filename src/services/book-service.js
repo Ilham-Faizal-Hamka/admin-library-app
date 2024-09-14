@@ -28,7 +28,7 @@ const register = async(request) => {
             stock: true
         }
     });
-} 
+}; 
 
 // get specific book
 const get = async(request) => {
@@ -55,7 +55,7 @@ const get = async(request) => {
             stock: true
         }
     });
-}
+};
 
 // get all available books 
 const list = async() => {
@@ -88,8 +88,8 @@ const list = async() => {
     return {
         availableBooks,
         totalAvailableBooks: totalAvailableBooks._sum.stock
-    }
-}
+    };
+};
 
 // update book
 const update = async(request) => {
@@ -122,11 +122,11 @@ const update = async(request) => {
             stock: true
         }
     });
-}
+};
 
 export default {
     register,
     get,
     list,
     update
-}
+};

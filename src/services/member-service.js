@@ -72,7 +72,7 @@ const list = async() => {
             borrows: true
         }
     });
-}
+};
 
 const borrowBook = async(memberCode, bookCode) => {
     const member = await checkMemberExistence(memberCode);
@@ -87,7 +87,7 @@ const borrowBook = async(memberCode, bookCode) => {
     const now = new Date();
     if(member.penalizedUntil) {
         if(member.penalizedUntil > now) {
-            throw new ResponseError(400, `Member is penalized until ${member.penalizedUntil}`)
+            throw new ResponseError(400, `Member is penalized until ${member.penalizedUntil}`);
         } else {
             await prismaClient.member.update({
                 where: {
@@ -101,7 +101,7 @@ const borrowBook = async(memberCode, bookCode) => {
     }
 
     if(member.borrows.length >= 2) {
-        throw new ResponseError(400, "Member cannot borrow more than 2 books")
+        throw new ResponseError(400, "Member cannot borrow more than 2 books");
     }
 
     // book stock -1
@@ -157,7 +157,7 @@ const returnBook = async(memberCode, bookCode) => {
     // apply penalty if borrow more than 7 days
     if(daysBorrowed > 7) {
         // penalized until 3 days from now
-        const penalized = new Date(now.getTime() + (1000 * 60 * 60 * 24 * 3))
+        const penalized = new Date(now.getTime() + (1000 * 60 * 60 * 24 * 3));
         await prismaClient.member.update({
             where: {
                 code: member.code

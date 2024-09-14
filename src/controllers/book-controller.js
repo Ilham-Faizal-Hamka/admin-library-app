@@ -9,7 +9,7 @@ const register = async(req, res, next) => {
     } catch (e) {
         next(e);
     }
-}
+};
 
 const get = async(req, res, next) => {
     try {
@@ -21,7 +21,7 @@ const get = async(req, res, next) => {
     } catch (e) {
         next(e);
     }
-}
+};
 
 const list = async(req, res, next) => {
     try {
@@ -32,7 +32,7 @@ const list = async(req, res, next) => {
     } catch (e) {
         next(e);
     }
-}
+};
 
 const update = async(req, res, next) => {
     try {
@@ -46,11 +46,11 @@ const update = async(req, res, next) => {
     } catch (e) {
         next(e);
     }
-}
+};
 
 export default {
     register,
     get,
     list,
     update
-}
+};

@@ -10,4 +10,4 @@ const getMemberValidation = Joi.string().required().max(20);
 export {
     registerMemberValidation,
     getMemberValidation
-}
+};
