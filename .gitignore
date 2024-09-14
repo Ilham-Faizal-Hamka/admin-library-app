@@ -2,3 +2,4 @@ node_modules
 .idx
 .env
 **/migrations
+package-lock.json

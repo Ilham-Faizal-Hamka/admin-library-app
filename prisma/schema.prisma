@@ -36,8 +36,6 @@ model BorrowedBook {
   memberCode String @db.VarChar(20)
   bookCode String @db.VarChar(20)
   borrowedAt DateTime @db.DateTime
-  returnedAt DateTime? @db.DateTime
-  returned Boolean @default(false)
   member Member @relation(fields: [memberCode], references: [code], map:"member_to_borrowedbooks_fk")
   book Book @relation(fields: [bookCode], references: [code], map:"book_to_borrowedbooks_fk")
 

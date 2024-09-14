@@ -106,29 +106,38 @@ const returnBook = async(memberCode, bookCode) => {
     const member = await checkMemberExistence(memberCode);
     const book = await checkBookExistence(bookCode);
 
-    const bookBorrowed = await prismaClient.bookBorrowed.findUnique({
+    console.info(member);
+    console.info(book);
+    console.info(member.code)
+    console.info(book.code)
+
+    // check if the book was borrowed by the member
+    const bookBorrowed = await prismaClient.borrowedBook.findFirst({
         where: {
-            memberCode: member.code,
-            bookCode: book.code
+            bookCode: book.code,
+            memberCode: member.code
+        },
+        select: {
+            memberCode: true,
+            bookCode: true,
+            borrowedAt: true
         }
     });
 
+    console.info(bookBorrowed);
+
+
     if (!bookBorrowed) {
-        throw new ResponseError(404, "Book not found");
-    }
-
-    if (bookBorrowed.returned) {
-        throw new ResponseError(400, "Book already returned");
-    }
-
-    if(!bookBorrowed || bookBorrowed.memberCode !== member.code){
-        throw new ResponseError(404, "This book was not borrowed by this member");
+        throw new ResponseError(404, "Books are not borrowed by the member concerned");
     }
 
     // calculate the number of days the book was borrowed
     const now = new Date();
     const borrowedAt = new Date(bookBorrowed.borrowedAt);
     const daysBorrowed = (now - borrowedAt) / (1000 * 60 * 60 * 24);
+    console.info(now);
+    console.info(borrowedAt);
+    console.info(daysBorrowed);
 
     // apply penalty if borrow more than 7 days
     if(daysBorrowed > 7) {
@@ -142,38 +151,28 @@ const returnBook = async(memberCode, bookCode) => {
         });
     }
 
-    // return the book
-    const bookReturned = await prismaClient.bookBorrowed.update({
+    // stock update
+    await prismaClient.book.update({
         where: {
-            memberCode: member.code,
-            bookCode: book.code
+            code: book.code
         },
         data: {
-            returnedAt: new Date(now),
-            returned: true
+            stock: book.stock + 1,
+        }
+    });
+
+    return prismaClient.borrowedBook.delete({
+        where: {
+            memberCode_bookCode: {
+                memberCode: member.code,
+                bookCode: book.code
+            }
         },
         include: {
             member: true,
             book: true
         }
     });
-
-    await prismaClient.book.update({
-        where: {
-            code: bookCode
-        },
-        data: {
-            stock: book.stock + 1
-        },
-        select: {
-            code: true,
-            title: true,
-            author: true,
-            stock: true
-        }
-    });
-
-    return bookReturned;
 }
 
 export default {

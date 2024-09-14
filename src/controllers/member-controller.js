@@ -33,8 +33,8 @@ const returnBook = async(req, res, next) => {
 
         const result = await memberService.returnBook(memberCode, bookCode);
         res.status(200).json({
-            data: result,
-            message: "Book returned successfully"
+            message: "Book returned successfully",
+            data: result
         });
     } catch (e) {
         next(e);

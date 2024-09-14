@@ -13,9 +13,7 @@ publicRouter.put("/books/:code", bookController.update);
 //member routes
 publicRouter.post("/members", memberController.regisgterMember);
 publicRouter.post("/members/:memberCode/borrow/:bookCode", memberController.borrowBook);
-publicRouter.post("/members/:memberCode/return/:bookCode", memberController.returnBook);
-
-
+publicRouter.delete("/members/:memberCode/return/:bookCode", memberController.returnBook);
 
 
 export {

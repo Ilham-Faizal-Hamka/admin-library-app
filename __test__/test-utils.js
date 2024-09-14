@@ -3,7 +3,9 @@ import { prismaClient } from "../src/application/database";
 export const removeBookTest = async () => {
     await prismaClient.book.deleteMany({
         where: {
-            code: "test-45"
+            code: {
+                contains: "test"
+            }
         }
     });
 };
@@ -11,7 +13,9 @@ export const removeBookTest = async () => {
 export const removeMemberTest = async () => {
     await prismaClient.member.deleteMany({
         where: {
-            code: "test-45"
+            code: {
+                contains: "test"
+            }
         }
     });
 };
@@ -21,6 +25,17 @@ export const removeBorrowedBookTest = async () => {
         where: {
             memberCode: "test-45",
             bookCode: "test-45"
+        }
+    });
+
+    await prismaClient.book.update({
+        where: {
+            code: "test-45"
+        },
+        data: {
+            stock: {
+                increment: 1
+            }
         }
     });
 };
@@ -36,6 +51,17 @@ export const createBookTest = async () => {
     });
 };
 
+export const createNewBookTest = async () => {
+    await prismaClient.book.create({
+        data: {
+            code: 'test-46',
+            title: 'test-title 2',
+            author: 'test-author 2',
+            stock: 1
+        }
+    });
+};
+
 export const createMemberTest= async() => {
     await prismaClient.member.create({
         data: {
@@ -44,6 +70,36 @@ export const createMemberTest= async() => {
         }
     });
 } 
+
+export const createNewMemberTest= async() => {
+    await prismaClient.member.create({
+        data: {
+            code: 'test-46',
+            name: 'test-name 2'
+        }
+    });
+} 
+
+export const createBorrowedBookTest = async() => {
+    await prismaClient.borrowedBook.create({
+        data: {
+            memberCode: 'test-45',
+            bookCode: 'test-45',
+            borrowedAt: new Date()
+        }
+    });
+
+    await prismaClient.book.update({
+        where: {
+            code: 'test-45'
+        },
+        data: {
+            stock: {
+                decrement: 1
+            }
+        }
+    });
+}
 
 export const getBookTest = async () => {
     return await prismaClient.book.findUnique({

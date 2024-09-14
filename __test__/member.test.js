@@ -1,6 +1,6 @@
 import supertest from "supertest";
 import { web } from "../src/application/web";
-import { createBookTest, removeBookTest, getBookTest, createMemberTest, removeMemberTest, getMemberTest, removeBorrowedBookTest } from "./test-utils";
+import { createBookTest, removeBookTest, getBookTest, createMemberTest, removeMemberTest, getMemberTest, createBorrowedBookTest, removeBorrowedBookTest } from "./test-utils";
 
 
 describe("POST /members", () => { 
@@ -77,4 +77,38 @@ describe("POST /members/:memberCode/borrow/:bookCode", () => {
         expect(result.status).toBe(404);
         expect(result.body.errors).toBeDefined();
     });
-})
+});
+
+describe("POST /members/:memberCode/return/:bookCode", () => {
+    beforeEach(async()=> {
+        await createMemberTest();
+        await createBookTest();
+        await createBorrowedBookTest();
+    });
+
+    afterEach(async() => {
+        await removeBorrowedBookTest();
+        await removeBookTest();
+        await removeMemberTest();
+    })
+
+    it("should can return book", async() => {
+        const member = await getMemberTest();
+        const book = await getBookTest();
+
+        const result = await supertest(web)
+            .delete("/members/" + member.code + "/return/" + book.code);
+        
+        expect(result.status).toBe(200);
+        expect(result.body.message).toBe("Book returned successfully");
+    })
+
+    it("should reject if member who borrow the book and book does not match", async() => {
+        
+        const result = await supertest(web)
+            .delete("/members/test-46/return/test-45");
+
+        expect(result.status).toBe(404);
+        expect(result.body.errors).toBeDefined();
+    })
+});
