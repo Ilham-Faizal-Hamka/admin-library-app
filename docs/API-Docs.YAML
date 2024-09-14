@@ -1,0 +1,270 @@
+openapi: 3.0.0
+info:
+  title: Library Management API
+  description: API for managing books and members in a library system.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local server
+
+paths:
+  /books:
+    post:
+      summary: Register a new book
+      tags:
+        - Books
+      requestBody:
+        description: Book object that needs to be added to the library
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                author:
+                  type: string
+                stock:
+                  type: integer
+      responses:
+        '200':
+          description: Book registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Book'
+    get:
+      summary: Get a list of all books
+      tags:
+        - Books
+      responses:
+        '200':
+          description: List of available books
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BookList'
+
+  /books/{code}:
+    get:
+      summary: Get book by code
+      tags:
+        - Books
+      parameters:
+        - in: path
+          name: code
+          required: true
+          schema:
+            type: string
+          description: The unique code of the book
+      responses:
+        '200':
+          description: Book found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Book'
+        '404':
+          description: Book not found
+
+    put:
+      summary: Update a book by code
+      tags:
+        - Books
+      parameters:
+        - in: path
+          name: code
+          required: true
+          schema:
+            type: string
+          description: The unique code of the book
+      requestBody:
+        description: Updated book data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                author:
+                  type: string
+                stock:
+                  type: integer
+      responses:
+        '200':
+          description: Book updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Book'
+        '404':
+          description: Book not found
+
+  /members:
+    post:
+      summary: Register a new member
+      tags:
+        - Members
+      requestBody:
+        description: Member object that needs to be added
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                code:
+                  type: string
+      responses:
+        '200':
+          description: Member registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Member'
+
+    get:
+      summary: Get a list of all members
+      tags:
+        - Members
+      responses:
+        '200':
+          description: List of members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Member'
+
+  /members/{memberCode}/borrow/{bookCode}:
+    post:
+      summary: Borrow a book
+      tags:
+        - Members
+      parameters:
+        - in: path
+          name: memberCode
+          required: true
+          schema:
+            type: string
+          description: The unique code of the member
+        - in: path
+          name: bookCode
+          required: true
+          schema:
+            type: string
+          description: The unique code of the book
+      responses:
+        '200':
+          description: Book borrowed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/BorrowedBook'
+                  message:
+                    type: string
+                    example: Book borrowed successfully
+
+  /members/{memberCode}/return/{bookCode}:
+    delete:
+      summary: Return a borrowed book
+      tags:
+        - Members
+      parameters:
+        - in: path
+          name: memberCode
+          required: true
+          schema:
+            type: string
+          description: The unique code of the member
+        - in: path
+          name: bookCode
+          required: true
+          schema:
+            type: string
+          description: The unique code of the book
+      responses:
+        '200':
+          description: Book returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/BorrowedBook'
+                  message:
+                    type: string
+                    example: Book returned successfully
+
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        code:
+          type: string
+        title:
+          type: string
+        author:
+          type: string
+        stock:
+          type: integer
+
+    BookList:
+      type: object
+      properties:
+        availableBooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Book'
+        totalAvailableBooks:
+          type: integer
+
+    Member:
+      type: object
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+        penalizedUntil:
+          type: string
+          format: date-time
+
+    BorrowedBook:
+      type: object
+      properties:
+        memberCode:
+          type: string
+        bookCode:
+          type: string
+        borrowedAt:
+          type: string
+          format: date-time
